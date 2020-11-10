@@ -3,6 +3,8 @@
 
 The project is the code for the paper "Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution".
 
-The software environment of the source code requires Java, eclipse and MATLAB 2017.
+In this project, we designed a simulation platform for federated learning and implemented our algorithm based on this platform.
 
-## Note: in order to run this project successfully, matlab must be installed correctly!!!
+### The software environment of the source code requires Java, eclipse and MATLAB 2017.
+
+### Note: in order to run this project successfully, matlab must be installed correctly!!!
