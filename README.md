@@ -1,5 +1,5 @@
 
-# Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution
+## Code for Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution
 
 The project is the code for the paper "Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution".
 
