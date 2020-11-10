@@ -7,4 +7,4 @@ In this project, we designed a simulation platform for federated learning and im
 
 ### The software environment of the source code requires Java, eclipse and MATLAB 2017.
 
-### Note: in order to run this project successfully, matlab must be installed correctly!!!
+### Note: in order to run this project successfully, Matlab 2017 must be installed correctly!!!
