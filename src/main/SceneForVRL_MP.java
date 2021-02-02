@@ -41,12 +41,12 @@ public class SceneForVRL_MP {
 		Map<String, Object> logMp=new HashMap<String, Object>();
 		Common.deleteDir("objs");
 		double lambda = 1; // the lambda
-//		int[] dim={41,40}; // features of each participant, for 2 participants
+		int[] dim={41,40}; // features of each participant, for 2 participants
 //		int[] dim={27,27,27}; // features of each participant, for 3 participants
-		int[] dim={21,20,20,20}; // features of each participant, for 4 participants
+//		int[] dim={21,20,20,20}; // features of each participant, for 4 participants
 //		int[] dim={17,16,16,16,16}; // features of each participant, for 5 participants
 		// numbers of samples, ith number is the number of samples of ith experiment
-		int[] sampleArr={1000,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,21263};
+		int[] sampleArr={1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,21263};
 		///////////////////////////////////////////////////////////////////////////////////////
 		String agentName = "coordinator";
 		Coordinator ca = new Coordinator(agentName);

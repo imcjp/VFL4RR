@@ -51,7 +51,7 @@ public class SceneForVRG {
 		double learningRate=0.1; // learning rate
 		double momentum=0.9; // momentum
 		int nSample=1000; // number of samples
-		int iter=2; //iteration number
+		int iter=100; //iteration number
 		//////////////////////////////////////////////////////////////////
 		String agentName = "coordinator";
 		Coordinator ca = new Coordinator(agentName);

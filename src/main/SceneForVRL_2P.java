@@ -46,8 +46,8 @@ public class SceneForVRL_2P {
 		Common.deleteDir("objs");
 		double lambda = 1; // the lambda
 		int[] dim={41,40}; // features of each participant
-		int[] sampleArr={1000,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,21263};
-//		int[] sampleArr={600,1000}; // numbers of samples, ith number is the number of samples of ith experiment
+		// numbers of samples, ith number is the number of samples of ith experiment
+		int[] sampleArr={1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000,21000,21263}; 
 		//////////////////////////////////////////////////////////////
 		String agentName = "coordinator";
 		Coordinator ca = new Coordinator(agentName);
