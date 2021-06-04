@@ -29,17 +29,17 @@ java -jar VFL4RRExp.jar "{'lambda':10.0,'data':{'fileName':'Superconductivty.mat
 
 #### The command line parameters are explained as follows:
 
-**algorithm: **the algorithm used in your experiment. The optional parameters are VRG, VRL_ 2p and VRL_ MP。
+algorithm: the algorithm used in your experiment. The optional parameters are VRG, VRL_ 2p and VRL_ MP。
 
-**lambda: **lambda parameter of ridge regression.
+lambda: lambda parameter of ridge regression.
 
-**data: ** information about the dataset. The "fileName" is the name of the file of the dataset in the folder "in" or "dist\in"; "X" is the feature data in the dataset; :Y" is the numerical label in the dataset. The "learningRate" is the learning rate of VRG algorithm; The "initBias" is the size of the initial random model parameter w0 of VRG algorithm.
+data: information about the dataset. The "fileName" is the name of the file of the dataset in the folder "in" or "dist\in"; "X" is the feature data in the dataset; :Y" is the numerical label in the dataset. The "learningRate" is the learning rate of VRG algorithm; The "initBias" is the size of the initial random model parameter w0 of VRG algorithm.
 
-**parties: **information about federal learning participants. The "attrBlockNum" means that the features of data set are divided into "attrBlockNum" blocks averagely; the "partyNum" is the number of participants.
+parties: information about federal learning participants. The "attrBlockNum" means that the features of data set are divided into "attrBlockNum" blocks averagely; the "partyNum" is the number of participants.
 
-**iteration: **if VRG algorithm cannot find better model parameters for successive "iteration" times, the algorithm stops.
+iteration: if VRG algorithm cannot find better model parameters for successive "iteration" times, the algorithm stops.
 
-**subDataNum: **indicates the size of the sub data set used in the experiment. If the subDataNum= - 1, it means that the complete dataset is used for the experiment.
+subDataNum: indicates the size of the sub data set used in the experiment. If the subDataNum= - 1, it means that the complete dataset is used for the experiment.
 
-**sampleInfo: **our experiment uses k-fold cross validation. The "sampleBlockNum" means that the dataset is divided into "sampleBlockNum" blocks averagely, "testBlockId" means that the "testBlockId"-th block is the test set, and the rest is the training set. If testBlockId= 0, the experiment does not use test set.
+sampleInfo: our experiment uses k-fold cross validation. The "sampleBlockNum" means that the dataset is divided into "sampleBlockNum" blocks averagely, "testBlockId" means that the "testBlockId"-th block is the test set, and the rest is the training set. If testBlockId= 0, the experiment does not use test set.
 
