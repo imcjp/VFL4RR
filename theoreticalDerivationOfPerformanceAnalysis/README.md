@@ -32,7 +32,7 @@ We use comments to mark the exact source of each calculation in the scripts and 
 
 Readers can read our scripts and code summaries to check the correctness of Tab. 2,3,4 in the Paper.
 
-### II. The symbols used in the scripts are described as follows:
+### II. The part of symbols used in the scripts are described as follows:
 
 1. d_1,d_2,d_i,d_m: $d_1$,$d_2$,$d_i$,$d_m$
 2. d_1_is1: $d_{1 \sim i-1}=\sum\nolimits_{t=1}^{i-1}{{{d}_{t}}}$
