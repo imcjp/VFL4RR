@@ -1,4 +1,4 @@
-function [res] = tColMulWithOrth(n,m,k)
+function [res] = tSEM(n,m,k)
 % The Time cost of SEM for A * B, where A with shape n*k and B with shape k*m
 % The return is a 6-tuple, with each element defined as follows:
 % 1. Encrypted Computation Cost

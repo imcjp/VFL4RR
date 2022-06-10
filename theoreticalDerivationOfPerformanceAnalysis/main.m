@@ -15,7 +15,7 @@ disp('b) Analysis for role "C"')
 showRes(R(2,:))
 
 disp('3. The Time Cost of Protocol SEM');
-R=tColMulWithOrth(d_i,d_j,n);
+R=tSEM(d_i,d_j,n);
 disp('a) Analysis for role "Fi"')
 showRes(R(1,:))
 disp('b) Analysis for role "Fj"')
