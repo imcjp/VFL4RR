@@ -30,7 +30,7 @@ The analysis results of the above scripts are **all derived from our source code
 
 We use comments to mark the exact source of each calculation in the scripts and summarize the key code of each protocol and algorithm in folder **"summaryOfCode"**.
 
-Readers can read our scripts and code summaries to check the correctness of Tables 2,3,4 in the Paper.
+Readers can read our scripts and code summaries to check the correctness of Tab. 2,3,4 in the Paper.
 
 ### II. The symbols used in the scripts are described as follows:
 
