@@ -1,0 +1,137 @@
+==>{"class":"client.ClientForParticipant","function":"coMul","protocol":"SEM","role":"Fi"}
+public MWNumericArray coMul(MWNumericArray M,int taskId,int p) {
+    if (p<1 ||p>2) {
+        return null;
+    }
+    int port=INIT_LISTEN_PORT_COMUL;
+    int[] sz=M.getDimensions();
+    ReqFunc rf=null;
+    do {
+
+        while (true) {
+            boolean xx=false;
+            for (int i = 0; i < 10; i++) {
+                if (isPortLocked(port+i)) {
+                    xx=true;
+                    break;
+                }
+            }
+            if (xx==false) {
+                break;
+            }
+            port+=10;
+        }
+        rf=new ReqFunc(this.getName(), NameOfProtocols.COMUL, port, taskId,sz[0],sz[1],p);
+    } while (!sendMessage(serverName, 80, rf));//*4:1
+    Message msg= null;
+    msg= waitMessage(port+1);
+    MWNumericArray errC=(MWNumericArray) msg.getObj();//*6:m*n
+    msg= waitMessage(port+2);
+    Object[] obj=(Object[]) msg.getObj();
+    String copper=(String) obj[0];
+    int coPort=(int) obj[1];
+    MWNumericArray res=null;
+    if (p==1) {
+        msg= waitMessage(port+3);
+        MWNumericArray errA=(MWNumericArray) msg.getObj();//*6:n*k
+        MWNumericArray U=M;
+        MWNumericArray Alpha=MatComputeHelper.subtract(U, errA);//*2:n*k
+        sendMessage(copper, coPort+4, Alpha);//*4:n*k
+        msg= waitMessage(port+4);
+        MWNumericArray Beta=(MWNumericArray)msg.getObj();//*6:m*k
+        res=MatComputeHelper.add(errC,MatComputeHelper.mul(errA, Beta));//*2:n*m*k+n*m
+    }else{
+        ......
+    }
+    return res;
+}
+<==
+==>{"class":"client.ClientForParticipant","function":"coMul","protocol":"SEM","role":"Fj"}
+public MWNumericArray coMul(MWNumericArray M,int taskId,int p) {
+    if (p<1 ||p>2) {
+        return null;
+    }
+    int port=INIT_LISTEN_PORT_COMUL;
+    int[] sz=M.getDimensions();
+    ReqFunc rf=null;
+    do {
+
+        while (true) {
+            boolean xx=false;
+            for (int i = 0; i < 10; i++) {
+                if (isPortLocked(port+i)) {
+                    xx=true;
+                    break;
+                }
+            }
+            if (xx==false) {
+                break;
+            }
+            port+=10;
+        }
+        rf=new ReqFunc(this.getName(), NameOfProtocols.COMUL, port, taskId,sz[0],sz[1],p);
+    } while (!sendMessage(serverName, 80, rf));//*4:1
+    Message msg= null;
+    msg= waitMessage(port+1);
+    MWNumericArray errC=(MWNumericArray) msg.getObj();//*6:m*n
+    msg= waitMessage(port+2);
+    Object[] obj=(Object[]) msg.getObj();
+    String copper=(String) obj[0];
+    int coPort=(int) obj[1];
+    MWNumericArray res=null;
+    if (p==1) {
+        ......
+    }else{
+        msg= waitMessage(port+3);
+        MWNumericArray errB=(MWNumericArray) msg.getObj();//*6:m*k
+        MWNumericArray V=M;
+        MWNumericArray Beta=MatComputeHelper.subtract(V, errB);//*2:m*k
+        sendMessage(copper, coPort+4, Beta);//*4:m*k
+        msg= waitMessage(port+4);
+        MWNumericArray Alpha=(MWNumericArray)msg.getObj();//*6:n*k
+        res=MatComputeHelper.add(errC, MatComputeHelper.mul(Alpha, errB));//*2:n*m*k+n*m
+        res=MatComputeHelper.add(res, MatComputeHelper.mul(Alpha, Beta));//*2:n*m*k+n*m
+    }
+    return res;
+}
+<==
+==>{"class":"server.RoomForSEM","function":"run","protocol":"SEM","role":"C"}
+public void run() {
+    int[] parm1=objs.get(0);
+    int[] parm2=objs.get(1);
+    String player1=players.get(0);//*6:1
+    String player2=players.get(1);//*6:1
+    if (parm2[2]==1 && parm1[2]==2){
+        int[] t=parm1;
+        parm1=parm2;
+        parm2=t;
+        String st=player1;
+        player1=player2;
+        player2=st;
+    }else if (parm2[2]==2 && parm1[2]==1) {
+
+    }else{
+        System.out.println("The 2 matrices number error...");
+        return ;
+    }
+    if (parm1[1]!=parm2[0]) {
+        System.out.println("Matrix shape mismatch, cannot multiply...");
+        return ;
+    }
+    double errW=1000;
+    MWNumericArray A=MatComputeHelper.randn(parm1[0], parm1[1]);
+    MWNumericArray B=MatComputeHelper.randn(parm2[0], parm2[1]);
+    A=MatComputeHelper.mul(A, errW);//*2:n*k
+    B=MatComputeHelper.mul(B, errW);//*2:m*k
+    MWNumericArray C=MatComputeHelper.mul(A, B);//*2:m*n*k
+    MWNumericArray C1=MatComputeHelper.randn(parm1[0], parm2[1]);
+    C1=MatComputeHelper.mul(C1, (errW*10)*(errW*10));
+    MWNumericArray C2=MatComputeHelper.subtract(C, C1);//*2:m*n
+    agent.sendMessage(player1, parm1[3]+1, C1);//*4:m*n
+    agent.sendMessage(player2, parm2[3]+1, C2);//*4:m*n
+    agent.sendMessage(player1, parm1[3]+2, new Object[]{player2,parm2[3]});
+    agent.sendMessage(player2, parm2[3]+2, new Object[]{player1,parm1[3]});
+    agent.sendMessage(player1, parm1[3]+3, A);//*4:n*k
+    agent.sendMessage(player2, parm2[3]+3, B);//*4:m*k	
+}
+<==

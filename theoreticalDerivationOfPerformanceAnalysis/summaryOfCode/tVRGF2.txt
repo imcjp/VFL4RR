@@ -1,0 +1,57 @@
+==>{"class":"algs.vrg.Party2","function":"run & update","alg":"VRG","role":"F2"}
+public void run() {
+    Message msg=null;
+    msg=waitMessage(21);
+    EncMat encua=(EncMat) msg.getObj();//*5:n
+    msg=waitMessage(21);
+    EncMat encLa=(EncMat) msg.getObj();//*5:1
+    MWNumericArray X=X0;
+    MWNumericArray Xt = MatComputeHelper.transpose(X);
+    MWNumericArray u=MatComputeHelper.mul(X, w);//*2:n*d_2
+    MWNumericArray db=MatComputeHelper.subtract(u, y);//*2:n
+    EncMat encdb=new EncMatMultThread(db, pubKey);//*1:n
+    MWNumericArray Lb=MatComputeHelper.mul(MatComputeHelper.transpose(db), db);//*2:n
+    Lb=MatComputeHelper.add(Lb, MatComputeHelper.mul(algInfo.getLambda(),MatComputeHelper.mul(MatComputeHelper.transpose(w), w)));//*2:d_2+2
+    EncMat encLab=EncMat.mul2(MatComputeHelper.transpose(MatComputeHelper.mul(2,db)), encua);//*2:n;1:n
+    EncMat encL=encLa.add(Lb).add(encLab);//*1:2
+    sendMessage(algInfo.getParty(1), 21, encdb);//*3:n
+    sendMessage(algInfo.getCoordinator(), 21, encL);//*3:1
+    EncMat encd=encdb.add(encua);//*1:n
+    EncMat encg=EncMat.mul2(Xt, encd).add(MatComputeHelper.mul(algInfo.getLambda(), w));//*2:d_2;1:n*d_2+d_2
+    g=decr(encg);//*tDecr(d_2,1)>1
+    g=MatComputeHelper.mul(1.0/n, g);//*2:d_2
+}
+public void update(int iter) {
+    double beta1=algInfo.getBeta1();
+    double beta2=algInfo.getBeta2();
+    double learningRate=algInfo.getLearningRate();
+    double epsilon=algInfo.getEpsilon();
+    double g2n[]=g.getDoubleData();
+    for (int i = 0; i < g2n.length; i++) {
+        g2n[i]=g2n[i]*g2n[i];
+    }
+    MWNumericArray g2 = MatComputeHelper.transpose(new MWNumericArray(g2n, MWClassID.DOUBLE));
+    if (m==null) {
+        m=MatComputeHelper.mul(1-beta1, g);
+    }else {
+        m=MatComputeHelper.add(MatComputeHelper.mul(beta1, m), MatComputeHelper.mul(1-beta1, g));//*2:3*d_2
+    }
+    if (v==null) {
+        v=MatComputeHelper.mul(1-beta2, g2);
+    }else {
+        v=MatComputeHelper.add(MatComputeHelper.mul(beta2, v), MatComputeHelper.mul(1-beta2, g2));//*2:3*d_2
+    }
+    MWNumericArray mHat=MatComputeHelper.mul(m, 1/(1-Math.pow(beta1, iter)));//*2:d_2
+    MWNumericArray vHat=MatComputeHelper.mul(v, 1/(1-Math.pow(beta2, iter)));//*2:d_2
+    double [] mHatData=mHat.getDoubleData();
+    double [] vHatData=vHat.getDoubleData();
+    double [] dtWData=new double[mHatData.length];
+    for (int i = 0; i < mHatData.length; i++) {
+        dtWData[i]=learningRate*mHatData[i]/(Math.sqrt(vHatData[i])+epsilon);//*2:3*d_2
+    }
+    MWNumericArray dtW=MatComputeHelper.transpose(new MWNumericArray(dtWData, MWClassID.DOUBLE));
+    wBak=w;
+    w=MatComputeHelper.subtract(w, dtW);//*2:d_2
+    gBak=g;
+}
+<==

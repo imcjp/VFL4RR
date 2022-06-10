@@ -1,0 +1,53 @@
+==>{"class":"client.ClientForParticipant","function":"inv","protocol":"MIA","role":"F"}
+public EncMat inv(EncMat encA) {
+    int port=INIT_LISTEN_PORT;
+    if (encA.getN()!=encA.getM()) {
+        Common.println("The matrix to be inverted must be a square matrix!!!");
+        return null;
+    }
+    Common.println("masking process...");
+    EncMat.tic();
+    MWNumericArray errA=MatComputeHelper.randn(encA.getN(), encA.getM());//*2:n^2
+    EncMat inA=EncMat.mul2(errA, encA);//*1:n^3
+    EncMat.toc();
+    ReqFunc rf=null;
+    do {
+        while (isPortLocked(port)) {
+            port++;
+        }
+        rf=new ReqFunc(this.getName(), NameOfProtocols.INV, port, inA);//*3:n^2
+    } while (!sendMessage(serverName, 80, rf));
+    Message msg= waitMessage(port);
+    Common.println("unmasking process...");
+    EncMat.tic();
+    EncMat enciA=(EncMat) msg.getObj();//*5:n^2
+    EncMat res=enciA.mul(errA);//*1:n^3
+    EncMat.toc();
+    return res;
+}
+<==
+==>{"class":"server.ProtocolThread","function":"run","protocol":"MIA","role":"C"}
+protected int run(int id, ReqFunc obj) {
+    ...... if (NameOfProtocols.INV.equals(funcName)) {
+        ret = 2;
+        Common.println(funcName + ": Parameter acquisition process...");
+        EncMat.tic();
+        Object[] params = obj.getParams();//*5:n^2
+        EncMat encA = (EncMat) params[0];
+        MWNumericArray A = encA.getDecrMW(priKey);//*1:n^2
+        EncMat.toc();
+        ret = 3;
+        Common.println(funcName + ": Calculation process...");
+        EncMat.tic();
+        MWNumericArray iA = MatComputeHelper.inv(A);//*2:n^3
+        EncMat enciA = new EncMatMultThread(iA, agent.getPubKey());//*1:n^2
+        EncMat.toc();
+        ret = 4;
+        Common.println(funcName + ": Transmission process...");
+        EncMat.tic();
+        agent.sendMessage(obj.getSender(), obj.getRetPort(), enciA);//*3:n^2
+        EncMat.toc();
+        ret = 0;
+    } else ......
+}
+<==

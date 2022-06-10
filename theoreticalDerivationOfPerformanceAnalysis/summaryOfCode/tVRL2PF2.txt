@@ -1,0 +1,44 @@
+==>{"class":"algs.vrl2p.Party2","function":"run","alg":"VRL-2P","role":"F2"}
+	public void run() {
+		Common.println("Participant2 started...");
+		double omiga=1.0/n;
+		int p = 1;
+		Message msg = null;
+		MWNumericArray Q=MatComputeHelper.randOrthMat(d);//*2:d_2^2
+		MWNumericArray X=MatComputeHelper.mul(X0, Q);//*2:d_2^2*n
+		MWNumericArray Xt = MatComputeHelper.mul(MatComputeHelper.transpose(X),omiga);//*2:n*d_2
+		MWNumericArray F2=coMul(X, algInfo.getTestId()*Common.ROOMID_BIAS+1, 2);//*tColMul(d_1,d_2,n)>2
+		msg=waitMessage(21);
+		EncMat encF1=(EncMat) msg.getObj();//*5:d_1*d_2
+		EncMat M12=encF1.add(F2);//*1:d_1*d_2
+		sendMessage(algInfo.getParty(1), 21, M12);//*3:d_1*d_2
+		EncMat M21=M12.transpose();
+		MWNumericArray M22 = MatComputeHelper.add(
+				MatComputeHelper.mul(Xt, X),
+				MatComputeHelper.mul(MatComputeHelper.eye(d), algInfo.getLambda()*omiga));//*2:d_2^2*n+d_2
+		MWNumericArray C = MatComputeHelper.inv(M22);//*2:d_2^3
+		EncMat encC=new EncMatMultThread(C,pubKey);//*1:d_2^2
+		sendMessage(algInfo.getParty(1), 21, encC);//*3:d_2^2
+		msg = waitMessage(21);
+		EncMat encCt = (EncMat) msg.getObj();//*5:d_1^2
+		EncMat encR=mul(encCt, M12);//*tMMA(d_1,d_2,d_1)>1
+		encR=mul(M21, encR);//*tMMA(d_2,d_2,d_1)>1
+		encR=new EncMatMultThread(M22, pubKey).subtract(encR);//*1:d_2^2
+		encR=inv(encR);//*tMIA(d_2)>1
+		MWNumericArray r12=coMul(y, algInfo.getTestId()*Common.ROOMID_BIAS+2, 2);//*tColMul(d_1,1,n)>2
+		EncMat encr12=new EncMatMultThread(r12, pubKey);//*1:d_1
+		sendMessage(algInfo.getParty(1), 21, encr12);//*3:d_1
+		MWNumericArray r2=MatComputeHelper.mul(Xt, y);//*2:d_2*n
+		EncMat encu2=encR.mul(r2);//*1:d_2^2
+		sendMessage(algInfo.getParty(1), 21, encu2);//*3:d_2
+		msg = waitMessage(21);
+		EncMat encu1=(EncMat) msg.getObj();//*5:d_1
+		EncMat encv2=EncMat.mul2(C, mul(M21, encu1));//*tMMA(d_2,1,d_1)>1
+		//<Same as Last Line> EncMat encv2=EncMat.mul2(C, mul(M21, encu1));//*1:d_2^2
+		EncMat encw = encu2.subtract(encv2);//*1:d_2
+		res = MatComputeHelper.mul(Q,decr(encw));//*tDecr(d_2,1)>1
+		//<Same as Last Line> res = MatComputeHelper.mul(Q,decr(encw));//*2:d_2^2
+		Common.println(getName() + "========" + (p++)
+				+ "===========================");
+	}
+<==

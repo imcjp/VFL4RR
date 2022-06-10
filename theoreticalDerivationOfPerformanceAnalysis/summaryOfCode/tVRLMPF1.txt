@@ -1,0 +1,62 @@
+==>{"class":"algs.vrlmp.Party","function":"run","alg":"VRL-MP","role":"F1"}
+	public void run() {
+		int mxPid=algInfo.getMxPid();
+		double omiga=1.0/n;
+		Message msg = null;
+		MWNumericArray Q=MatComputeHelper.randOrthMat(d);//*2:d_i^2
+		MWNumericArray X=MatComputeHelper.mul(X0, Q);//*2:d_i^2*n
+		MWNumericArray Xt = MatComputeHelper.transpose(MatComputeHelper.mul(X, omiga));//*2:d_i*n
+		int roomNum=0;
+		MWNumericArray F1s[]=new MWNumericArray[pid];
+		for (int i = 0; i < mxPid; i++) {
+			if (i!=pid) {
+				if (i<pid) {
+					roomNum=pid*100+i+algInfo.getTestId()*Common.ROOMID_BIAS;
+					F1s[i]=coMul(X, roomNum, 2);//*tSColMul1(d_1_is1,d_i,n,i-1)>2
+				}else if(i>pid){
+					roomNum=i*100+pid+algInfo.getTestId()*Common.ROOMID_BIAS;
+					MWNumericArray F1=coMul(Xt, roomNum, 1);//*tSColMul2(d_i,d_ia1_m,n,m-i)>1
+					EncMat encF1=new EncMatMultThread(F1,pubKey);//*1:d_i*d_ia1_m
+					sendMessage(algInfo.getParty(i), 21, encF1);//*3:d_i*d_ia1_m
+				}
+			}
+		}
+		EncMat encMs[]=new EncMat[pid];
+		for (int i = 0; i < pid; i++) {
+			msg=waitMessage(21);
+			String sender=msg.getSender();
+			int sid=Integer.parseInt(sender.substring(algInfo.getPartyGroup().length()));
+			EncMat F2=(EncMat) msg.getObj();//*5:d_1_is1*d_i
+			encMs[sid]=F2.add(F1s[sid]);//*1:d_1_is1*d_i
+		}
+		EncMat encMr=null;
+		if (pid>0) {
+			encMr=EncMat.vstack(encMs);
+		}
+		EncMat encr=null;
+		if (pid<mxPid-1) {
+			roomNum=10000+pid+algInfo.getTestId()*Common.ROOMID_BIAS;
+			MWNumericArray y1=coMul(Xt, roomNum, 1);//*tColMul(d_i,1,n)>1
+			EncMat ency1=new EncMatMultThread(y1,pubKey);//*1:d_i
+			sendMessage(algInfo.getParty(mxPid-1), 20, ency1);//*3:d_i
+		}else{
+            ......
+		}
+		EncMat encR=null;
+		EncMat encResW=null;
+		if (pid==0) {
+			MWNumericArray XX = MatComputeHelper.add(
+			MatComputeHelper.mul(Xt, X),
+			MatComputeHelper.mul(MatComputeHelper.eye(d), algInfo.getLambda()*omiga));//*2:d_i^2*n+d_i
+			MWNumericArray R = MatComputeHelper.inv(XX);//*2:d_i^3
+			encR=new EncMatMultThread(R,pubKey);//*1:d_i^2
+			sendMessage(algInfo.getParty(pid+1), 22, encR);//*3:d_i^2
+			msg=waitMessage(23);
+			encResW=(EncMat) msg.getObj();//*5:d_i
+		}else{
+            ......
+		}
+		MWNumericArray resw=decr(encResW);//*tDecr(d_i,1)>1
+		res=MatComputeHelper.mul(Q, resw);//*2:d_i^2
+	}
+<==

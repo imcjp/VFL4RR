@@ -1,0 +1,44 @@
+==>{"class":"client.ClientForParticipant","function":"decr","protocol":"Decr","role":"F"}
+public MWNumericArray decr(EncMat encA) {
+    int port=INIT_LISTEN_PORT;
+    Common.println("masking process...");
+    EncMat.tic();
+    double errW=100000;
+    MWNumericArray errA=MatComputeHelper.mul(MatComputeHelper.randn(encA.getN(), encA.getM()),errW);//*2:n*m
+    ReqFunc rf=null;
+    EncMat inA=encA.add(errA);//*1:n*m
+    EncMat.toc();
+    do {
+        while (isPortLocked(port)) {
+            port++;
+        }
+        rf=new ReqFunc(this.getName(), NameOfProtocols.DECR, port, inA);//*3:n*m
+    } while (!sendMessage(serverName, 80, rf));
+    Message msg= waitMessage(port);
+    Common.println("unmasking process...");
+    EncMat.tic();
+    MWNumericArray res=(MWNumericArray) msg.getObj();//*6:n*m
+    res=MatComputeHelper.subtract(res, errA);//*2:n*m
+    EncMat.toc();
+    return res;
+}
+<==
+==>{"class":"server.ProtocolThread","function":"run","protocol":"Decr","role":"C"}
+	protected int run(int id, ReqFunc obj) {
+		...... if (NameOfProtocols.DECR.equals(funcName)) {
+			ret = 2;
+			Common.println(funcName + ": Parameter acquisition process...");
+			EncMat.tic();
+			Object[] params = obj.getParams();//*5:n*m
+			EncMat encA = (EncMat) params[0];
+			MWNumericArray res = encA.getDecrMW(priKey);//*1:n*m
+			EncMat.toc();
+			ret = 4;
+			Common.println(funcName + ": Transmission process...");
+			EncMat.tic();
+			agent.sendMessage(obj.getSender(), obj.getRetPort(), res);//*4:n*m
+			EncMat.toc();
+			ret = 0;
+		}else ......
+	}
+<==

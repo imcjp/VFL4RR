@@ -1,0 +1,29 @@
+==>{"class":"exps.ExpForVRG","function":"run","alg":"VRG","role":"C"}
+public static Map<String, Object> run(String paramJson) {
+    ......
+    for (int i = 0; i <= 10000; i++) {
+        Common.tic();
+        lastFval = fval;
+        Stage stage = new Stage(2);
+        stage.start();
+        stage.addData(party1);
+        stage.addData(party2);
+        stage.waitForCompletion();
+        msg = coor.waitMessage(21);
+        EncMat encL = (EncMat) msg.getObj();//*5:1
+        fval = coor.decr(encL).getDouble();//*1:1
+        //Here, Party 1 call client.ClientForParticipant.decr, the coordinator executes passively. //*tDecr(d_1,1)>2
+        //Here, Party 2 call client.ClientForParticipant.decr, the coordinator executes passively. //*tDecr(d_2,1)>2
+        if (fval/lastFval > 0.9999) {
+            party1.rollback();
+            party2.rollback();
+            fval = lastFval;
+            noUpdateTime++;
+        }else{
+            noUpdateTime=0;
+        }
+        ......
+    }
+    ......
+}
+<==

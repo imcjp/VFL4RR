@@ -1,0 +1,109 @@
+==>{"class":"exps.ExpForVRL_2P","function":"run","alg":"VRL-2P","role":"C"}
+public class ExpForVRL_2P extends ExpFramework{
+	public ExpForVRL_2P(String name, boolean renew) {
+		super(name, renew);
+		// TODO Auto-generated constructor stub
+	}
+	public ExpForVRL_2P(String name, String path, boolean renew) {
+		super(name,path, renew);
+	}
+
+	public static Map<String,Object> run(String paramJson) {
+		NetCloud.initTrans();
+		Map<String,Object> param=(Map<String, Object>) JSON.parse(paramJson,
+				ExpHelper.MYJSON_FEATURE);
+//		//////////////////////////////////////////////////////////////////
+		AlgInfo algInfo=new AlgInfo();
+		algInfo.setLambda(((Number)param.get("lambda")).doubleValue());
+		algInfo.setExpName("ExpOn"+(System.currentTimeMillis()%10000000));
+		////////////////////////////////////////////////////////////////////
+		Map<String, Object> inputData=Common.loadTrainAndTestDataSet(param);
+		boolean hasTest = ((Map<String, Integer>) param.get("sampleInfo"))
+				.get("testBlockId") > 0;
+		MWNumericArray[] XTrainSet=(MWNumericArray[]) inputData.get("trainXs");
+		MWNumericArray yTrain=(MWNumericArray) inputData.get("trainY");
+		MWNumericArray[] XTestSet = null;
+		MWNumericArray yTest = null;
+		if (hasTest) {
+			XTestSet = (MWNumericArray[]) inputData.get("testXs");
+			yTest = (MWNumericArray) inputData.get("testY");
+		}
+		//////////////////////////////////////////
+
+		int nSample=yTrain.getDimensions()[0];
+		int dim[]=new int[2];
+		for (int i = 0; i < dim.length; i++) {
+			dim[i]=XTrainSet[i].getDimensions()[1];
+		}
+		//////////////////////////////////////////
+		CoordinationServer coor=new CoordinationServer(algInfo);
+		Party1 party1=new Party1(algInfo);
+		Party2 party2=new Party2(algInfo);
+		coor.setTheParticipants(party1, party2);
+		Map<String, Object> mp1=new HashMap<String, Object>();
+		Map<String, Object> mp2=new HashMap<String, Object>();
+		mp1.put("DataPiece", XTrainSet[0]);
+		mp2.put("DataPiece", XTrainSet[1]);
+		mp2.put("DataDecision",yTrain);
+		party1.loadData(mp1);
+		party2.loadData(mp2);
+		coor.prepare();
+		coor.startThread();
+		//Passive Execution by F1
+		//<Passive Execution> MWNumericArray F1=coMul(Xt, algInfo.getTestId()*Common.ROOMID_BIAS+1, 1);//*tColMul(d_1,d_2,n)>3
+		//<Passive Execution> EncMat encR=mul(encCt, M21);//*tMMA(d_2,d_1,d_2)>2
+		//<Passive Execution> encR=mul(M12, encR);//*tMMA(d_1,d_1,d_2)>2
+		//<Passive Execution> encR=inv(encR);//*tMIA(d_1)>2
+		//<Passive Execution> MWNumericArray r11=coMul(Xt, algInfo.getTestId()*Common.ROOMID_BIAS+2, 1);//*tColMul(d_1,1,n)>3
+		//<Passive Execution> EncMat encu1=mul(encR, encr);//*tMMA(d_1,1,d_1)>2
+		//<Passive Execution> EncMat encv1=EncMat.mul2(C, mul(M12, encu2));//*tMMA(d_1,1,d_2)>2
+		//<Passive Execution> res = MatComputeHelper.mul(Q,decr(encw));//*tDecr(d_1,1)>2
+		//Passive Execution by F2
+		//<Passive Execution> EncMat encR=mul(encCt, M12);//*tMMA(d_1,d_2,d_1)>2
+		//<Passive Execution> encR=mul(M21, encR);//*tMMA(d_2,d_2,d_1)>2
+		//<Passive Execution> encR=inv(encR);//*tMIA(d_2)>2
+		//<Passive Execution> EncMat encv2=EncMat.mul2(C, mul(M21, encu1));//*tMMA(d_2,1,d_1)>2
+		//<Passive Execution> res = MatComputeHelper.mul(Q,decr(encw));//*tDecr(d_2,1)>2
+		coor.run();
+		Map<String, Object> res=coor.getReport();
+		MWNumericArray w1=(MWNumericArray) party1.showResult();
+		MWNumericArray w2=(MWNumericArray) party2.showResult();
+//		System.out.println(w1);
+//		System.out.println(w2);
+		// 求目标函数值
+		MWNumericArray d1=MatComputeHelper.mul(XTrainSet[0], w1);
+		MWNumericArray d2=MatComputeHelper.mul(XTrainSet[1], w2);
+		MWNumericArray d=MatComputeHelper.subtract(MatComputeHelper.add(d1, d2),yTrain);
+		MWNumericArray L1=MatComputeHelper.mul(MatComputeHelper.transpose(d), d);
+		MWNumericArray wlen1=MatComputeHelper.mul(algInfo.getLambda(),MatComputeHelper.mul(MatComputeHelper.transpose(w1), w1));
+		MWNumericArray wlen2=MatComputeHelper.mul(algInfo.getLambda(),MatComputeHelper.mul(MatComputeHelper.transpose(w2), w2));
+		MWNumericArray wlen=MatComputeHelper.add(wlen1, wlen2);
+		double optVal=MatComputeHelper.add(L1, wlen).getDouble();
+		///////////////////////////////////
+		System.out.println("For experiment No."+(algInfo.getTestId()+1)+" by VRL-2P:");
+		System.out.println("\tThe number of samples is "+nSample+".");
+		System.out.println("\tThehe experiment is for "+dim.length+" parties.");
+		System.out.println("\t\tThe number of features they have is "+Arrays.toString(dim)+", respectively.");
+		System.out.println("\tThe running time of the experiment is "+(((Double) res.get("time"))/1000)+"s.");
+		System.out.println("\tThe object values is "+optVal+".");
+		if (hasTest) {
+			// 求预测结果
+			int nSampleTest=yTest.getDimensions()[0];
+//			System.out.println(w1);
+//			System.out.println(w2);
+			d1=MatComputeHelper.mul(XTestSet[0], w1);
+			d2=MatComputeHelper.mul(XTestSet[1], w2);
+			d=MatComputeHelper.subtract(MatComputeHelper.add(d1, d2),yTest);
+			L1=MatComputeHelper.mul(MatComputeHelper.transpose(d), d);
+			double rmse=Math.sqrt(L1.getDouble()/nSampleTest);
+			System.out.println("\tThe RMSE is "+rmse+".");
+			res.put("rmse", rmse);
+		}
+		res.put("optVal", optVal);
+		long trans=NetCloud.showTrans();
+		res.put("transport", trans);
+		////////////////////////////////////
+		coor.stop();
+		return res;
+	}
+<==

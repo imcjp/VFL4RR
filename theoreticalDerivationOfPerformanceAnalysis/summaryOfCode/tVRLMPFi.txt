@@ -1,0 +1,82 @@
+==>{"class":"algs.vrlmp.Party","function":"run","alg":"VRL-MP","role":"Fi"}
+	public void run() {
+		int mxPid=algInfo.getMxPid();
+		double omiga=1.0/n;
+		Message msg = null;
+		MWNumericArray Q=MatComputeHelper.randOrthMat(d);//*2:d_i^2
+		MWNumericArray X=MatComputeHelper.mul(X0, Q);//*2:d_i^2*n
+		MWNumericArray Xt = MatComputeHelper.transpose(MatComputeHelper.mul(X, omiga));//*2:d_i*n
+		int roomNum=0;
+		MWNumericArray F1s[]=new MWNumericArray[pid];
+		for (int i = 0; i < mxPid; i++) {
+			if (i!=pid) {
+				if (i<pid) {
+					roomNum=pid*100+i+algInfo.getTestId()*Common.ROOMID_BIAS;
+					F1s[i]=coMul(X, roomNum, 2);//*tSColMul1(d_1_is1,d_i,n,i-1)>2
+				}else if(i>pid){
+					roomNum=i*100+pid+algInfo.getTestId()*Common.ROOMID_BIAS;
+					MWNumericArray F1=coMul(Xt, roomNum, 1);//*tSColMul2(d_i,d_ia1_m,n,m-i)>1
+					EncMat encF1=new EncMatMultThread(F1,pubKey);//*1:d_i*d_ia1_m
+					sendMessage(algInfo.getParty(i), 21, encF1);//*3:d_i*d_ia1_m
+				}
+			}
+		}
+		EncMat encMs[]=new EncMat[pid];
+		for (int i = 0; i < pid; i++) {
+			msg=waitMessage(21);
+			String sender=msg.getSender();
+			int sid=Integer.parseInt(sender.substring(algInfo.getPartyGroup().length()));
+			EncMat F2=(EncMat) msg.getObj();//*5:d_1_is1*d_i
+			encMs[sid]=F2.add(F1s[sid]);//*1:d_1_is1*d_i
+		}
+		EncMat encMr=null;
+		if (pid>0) {
+			encMr=EncMat.vstack(encMs);
+		}
+		EncMat encr=null;
+		if (pid<mxPid-1) {
+			roomNum=10000+pid+algInfo.getTestId()*Common.ROOMID_BIAS;
+			MWNumericArray y1=coMul(Xt, roomNum, 1);//*tColMul(d_i,1,n)>1
+			EncMat ency1=new EncMatMultThread(y1,pubKey);//*1:d_i
+			sendMessage(algInfo.getParty(mxPid-1), 20, ency1);//*3:d_i
+		}else{
+			......
+		}
+		EncMat encR=null;
+		EncMat encResW=null;
+		if (pid==0) {
+			......
+		}else{
+			MWNumericArray C = MatComputeHelper.add(
+			MatComputeHelper.mul(Xt, X),
+			MatComputeHelper.mul(MatComputeHelper.eye(d), algInfo.getLambda()*omiga));//*2:d_i^2*n+d_i
+			msg=waitMessage(22);
+			EncMat encR0=(EncMat) msg.getObj();//*5:d_1_is1*d_1_is1
+			EncMat encMrt=encMr.transpose();
+			EncMat encB=mul(encMrt, encR0);//*tMMA(d_i,d_1_is1,d_1_is1)>1
+			EncMat encR4=mul(encB, encMr);//*tMMA(d_i,d_i,d_1_is1)>1
+			EncMat encC=new EncMatMultThread(C,pubKey);//*1:d_i^2
+			encR4=encC.subtract(encR4);//*1:d_i^2
+			encR4=inv(encR4);//*tMIA(d_i)>1
+			encR4=encR4.add(encR4.transpose()).mul(0.5);//*1:2*d_i^2
+			EncMat encBt=encB.transpose();
+			EncMat encR1=mul(encBt, encR4);//*tMMA(d_1_is1,d_i,d_i)>1
+			encR1=mul(encR1, encB);//*tMMA(d_1_is1,d_1_is1,d_i)>1
+			encR1=encR0.add(encR1);//*1:d_1_is1*d_1_is1
+			MWNumericArray G=MatComputeHelper.mul(MatComputeHelper.inv(C),-1);//*2:d_i^3+d_i^2
+			EncMat encR2=EncMat.mul2(G, encMrt);//*1:d_i^2*d_1_is1
+			encR2=mul(encR2,encR1);//*tMMA(d_i,d_1_is1,d_1_is1)>1
+			EncMat encR3=encR2.transpose();
+			encR=EncMat.hstack(EncMat.vstack(encR1,encR2),EncMat.vstack(encR3,encR4));
+			if (pid<mxPid-1) {
+				sendMessage(algInfo.getParty(pid+1), 22, encR);//*3:(d_1_is1+d_i)^2
+				msg=waitMessage(23);
+				encResW=(EncMat) msg.getObj();//*5:d_i
+			}else{
+				......
+			}
+		}
+		MWNumericArray resw=decr(encResW);//*tDecr(d_i,1)>1
+		res=MatComputeHelper.mul(Q, resw);//*2:d_i^2
+	}
+<==

@@ -1,0 +1,56 @@
+==>{"class":"client.ClientForParticipant","function":"mul","protocol":"MMA","role":"F"}
+public EncMat mul(EncMat encA,EncMat encB,double errW) {
+    int port=INIT_LISTEN_PORT;
+    Common.println("masking process...");
+    EncMat.tic();
+    MWNumericArray errA=MatComputeHelper.mul(MatComputeHelper.randn(encA.getN(), encA.getM()),errW);//*2:n*k
+    MWNumericArray errB=MatComputeHelper.mul(MatComputeHelper.randn(encB.getN(), encB.getM()),errW);//*2:k*m
+    ReqFunc rf=null;
+    EncMat inA=encA.add(errA);//*1:n*k
+    EncMat inB=encB.add(errB);//*1:k*m
+    EncMat.toc();
+    do {
+        while (isPortLocked(port)) {
+            port++;
+        }
+        rf=new ReqFunc(this.getName(), NameOfProtocols.MUL, port, inA,inB);//*3:n*k+m*k
+    } while (!sendMessage(serverName, 80, rf));
+    Message msg= waitMessage(port);
+    Common.println("unmasking process...");
+    EncMat.tic();
+    EncMat encC=(EncMat) msg.getObj();//*5:n*m
+    MWNumericArray errAB=MatComputeHelper.mul(errA, errB);//*2:k*m*n
+    encC=encC.subtract(encA.mul(errB)).subtract(EncMat.mul2(errA, encB)).subtract(errAB);//*1:2*k*m*n+4*n*m
+    EncMat.toc();
+    return encC;
+}
+<==
+==>{"class":"server.ProtocolThread","function":"run","protocol":"MMA","role":"C"}
+protected int run(int id, ReqFunc obj) {
+    String funcName = obj.getFuncName();
+    int ret = 1;
+    if (NameOfProtocols.MUL.equals(funcName)) {
+        ret = 2;
+        Common.println(funcName + ": Parameter acquisition process...");
+        EncMat.tic();
+        Object[] params = obj.getParams();
+        EncMat encA = (EncMat) params[0];//*5:n*k
+        EncMat encB = (EncMat) params[1];//*5:m*k
+        MWNumericArray A = encA.getDecrMW(priKey);//*1:n*k
+        MWNumericArray B = encB.getDecrMW(priKey);//*1:m*k
+        EncMat.toc();
+        ret = 3;
+        Common.println(funcName + ": Calculation process...");
+        EncMat.tic();
+        MWNumericArray C = MatComputeHelper.mul(A, B);//*2:n*m*k
+        EncMat encC = new EncMatMultThread(C, agent.getPubKey());//*1:n*m
+        EncMat.toc();
+        ret = 4;
+        Common.println(funcName + ": Transmission process...");
+        EncMat.tic();
+        agent.sendMessage(obj.getSender(), obj.getRetPort(), encC);//*3:n*m
+        EncMat.toc();
+        ret = 0;
+    } else ......
+}
+<==
