@@ -7,7 +7,7 @@ In this project, we designed a simulation platform for federated learning and im
 
 The software environment of the source code requires **Java 1.8.0**, **eclipse** and **MATLAB 2017**.
 
-**Note:** in order to run this project successfully, Java 8 and Matlab 2017 must be installed correctly!!! Besides, your computer should have enough memory (such as 32G) to hold the data, otherwise it may not be able to load the largest data set “TripDuration”.
+**Note:** in order to run this project successfully, Java 1.8 and Matlab 2017 must be installed correctly!!! Besides, your computer should have enough memory (such as 32G) to hold the data, otherwise it may not be able to load the largest data set “TripDuration”.
 
 
 
