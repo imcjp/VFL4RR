@@ -1,8 +1,0 @@
-For VRG:
-java -jar VFL4RRExp.jar "{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData','learningRate':1.0,'initBias':10.0},'parties':{'partyNum':2,'attrBlockNum':2},'iteration':10,'subDataNum':1000,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'VRG'}"
-
-For VRL-2P:
-java -jar VFL4RRExp.jar "{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData'},'parties':{'partyNum':2,'attrBlockNum':2},'subDataNum':10000,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'VRL_2P'}"
-
-For VRL-MP:
-java -jar VFL4RRExp.jar "{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData'},'parties':{'partyNum':5,'attrBlockNum':5},'subDataNum':10000,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'VRL_MP'}"
