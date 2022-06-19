@@ -20,16 +20,19 @@ The software environment of the source code requires **Java 1.8.0**, **eclipse**
 3. We provide the compiled .jar file in the folder **release**. If you need to run our algorithms directly, you can cd to the folder **release** through the console. Then execute the commands as follows. Some command line to run our algorithms as following:
 
     For NoFed:
-    java -Xms14576m -Xmx14576m -Xmn8480m -jar VFL4RRExp.jar "{'algorithm':'NoFed','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':1,'attrBlockNum':1},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
-    
+    java -jar VFL4RRExp.jar "{'algorithm':'NoFed','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':1,'attrBlockNum':1},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
+
     For VRG:
-    java -Xms14576m -Xmx14576m -Xmn8480m -jar VFL4RRExp.jar "{'algorithm':'VRG','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData','learningRate': 1,'initBias': 1},'lambda':10,'parties': {'partyNum':2,'attrBlockNum':2},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000,'iteration':10}"
-    
+    java -jar VFL4RRExp.jar "{'algorithm':'VRG','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData','learningRate': 1,'initBias': 1},'lambda':10,'parties': {'partyNum':2,'attrBlockNum':2},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000,'iteration':5}"
+
+    For CVRG:
+    java -jar VFL4RRExp.jar "{'algorithm':'CVRG','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData','learningRate': 1,'initBias': 1},'lambda':10,'parties': {'partyNum':2,'attrBlockNum':2},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000,'iteration':5}"
+
     For VRL-2P:
-    java  -Xms14576m -Xmx14576m -Xmn8480m -jar VFL4RRExp.jar "{'algorithm':'VRL_2P','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':2,'attrBlockNum':2},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
-    
+    java -jar VFL4RRExp.jar "{'algorithm':'VRL_2P','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':2,'attrBlockNum':2},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
+
     For VRL-MP:
-    java  -Xms14576m -Xmx14576m -Xmn8480m -jar VFL4RRExp.jar "{'algorithm':'VRL_MP','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':5,'attrBlockNum':5},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
+    java -jar VFL4RRExp.jar "{'algorithm':'VRL_MP','data': {'fileName': 'Superconductivty.mat','X': 'XData_norm','Y': 'yData'},'lambda':10,'parties': {'partyNum':5,'attrBlockNum':5},'subAttrNum':-1,'sampleInfo': {'sampleBlockNum':5,'testBlockId':1},'subDataNum':1000}"
 
 4. More information about parameter settings please use the Excel file **ParamSettingHelper.xlsx**. To help users quickly use our software, we have developed the Excel tool. Users can visually set parameters within this tool and it will automatically generate the corresponding command line. We provide careful support for users. You don't need to worry about setting the wrong parameters, because **ParamSettingHelper.xlsx** will automatically indicate that the user has entered the wrong parameters.
 
