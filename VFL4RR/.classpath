@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="lib/fastjson-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/sqlite-jdbc-3.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/ibatis2-common-2.1.7.597.jar"/>
-	<classpathentry kind="lib" path="lib/jef-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jmatio.jar"/>
+	<classpathentry kind="lib" path="lib/jef-api-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

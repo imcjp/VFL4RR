@@ -4,16 +4,18 @@ import java.util.Map;
 
 import model.Message;
 import security.EncMat;
-import security.EncMatMultThread;
 import alg.AlgInfo;
 import client.ClientForParticipant;
 
 import com.mathworks.toolbox.javabuilder.MWClassID;
 import com.mathworks.toolbox.javabuilder.MWNumericArray;
+
+import common.Common;
 import common.MatComputeHelper;
+import common.RandNumGenerator;
 /**
- * The code is for paper <b>"Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution"</b>. <br/>
- * This class is the first participant for VRG algorithm.
+ * The code is for paper <b>"Yang Q., Liu Y., Chen T., et al. (2019). Federated machine learning: concept and applications"</b>. <br/>
+ * This class is the first participant for CVR algorithm.
  */
 public class Party1 extends ClientForParticipant{
 	private AlgInfo algInfo;
@@ -27,7 +29,6 @@ public class Party1 extends ClientForParticipant{
 	private int d;
 	private MWNumericArray w = null;
 	private MWNumericArray g = null;
-	private MWNumericArray dw = null;
 	private MWNumericArray gBak = null;
 	private MWNumericArray wBak = null;
 
@@ -40,10 +41,10 @@ public class Party1 extends ClientForParticipant{
 		MWNumericArray X=X0;
 		MWNumericArray Xt = MatComputeHelper.transpose(X);
 		MWNumericArray u=MatComputeHelper.mul(X, w);
-		EncMat encua=new EncMatMultThread(u, pubKey);
+		EncMat encua=new EncMat(u, pubKey);
 		MWNumericArray La=MatComputeHelper.mul(MatComputeHelper.transpose(u), u);
 		La=MatComputeHelper.add(La, MatComputeHelper.mul(algInfo.getLambda(),MatComputeHelper.mul(MatComputeHelper.transpose(w), w)));
-		EncMat encLa=new EncMatMultThread(La, pubKey);
+		EncMat encLa=new EncMat(La, pubKey);
 		sendMessage(algInfo.getParty(2), 21, encua);
 		sendMessage(algInfo.getParty(2), 21, encLa);
 		msg=waitMessage(21);
@@ -96,8 +97,7 @@ public class Party1 extends ClientForParticipant{
 		X0 = (MWNumericArray) mp.get("DataPiece");
 		n=X0.getDimensions()[0];
 		d=X0.getDimensions()[1];
-//		w=MatComputeHelper.mul(algInfo.getInitBias(), RandNumGenerator.getRandn(d, 1, Common.SEED));
-		w=MatComputeHelper.mul(algInfo.getInitBias(), MatComputeHelper.randn(d, 1));
+		w=MatComputeHelper.mul(algInfo.getInitBias(), RandNumGenerator.getRandn(d, 1));
 		m=null;
 		v=null;
 	}

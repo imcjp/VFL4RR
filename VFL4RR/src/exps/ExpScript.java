@@ -20,6 +20,8 @@ public class ExpScript {
 		String alg=(String) param.get("algorithm");
 		if ("VRG".equals(alg)) {
 			res=ExpForVRG.run(arg0);
+		}else if("CVRG".equals(alg)){
+			res=ExpForCVRG.run(arg0);
 		}else if("VRL_2P".equals(alg)){
 			res=ExpForVRL_2P.run(arg0);
 		}else if ("VRL_MP".equals(alg)) {
@@ -32,6 +34,8 @@ public class ExpScript {
 
 //	For VRG:
 //	"{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData','learningRate':1.0,'initBias':10.0},'parties':{'partyNum':2,'attrBlockNum':2},'iteration':10,'subDataNum':100,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'VRG'}"
+//	For VRG:
+//	"{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData','learningRate':1.0,'initBias':10.0},'parties':{'partyNum':2,'attrBlockNum':2},'iteration':10,'subDataNum':100,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'CVRG'}"
 //	For VRL-2P:
 //	"{'lambda':10.0,'data':{'fileName':'Superconductivty.mat','X':'XData_norm','Y':'yData'},'parties':{'partyNum':2,'attrBlockNum':2},'subDataNum':10000,'sampleInfo':{'sampleBlockNum':10,'testBlockId':1},'algorithm':'VRL_2P'}"
 //	For VRL-MP:

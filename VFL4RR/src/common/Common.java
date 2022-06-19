@@ -30,7 +30,6 @@ public class Common {
 	public static int NUMBER_OF_THREAD_OF_MATOP = 8; // Number of threads used
 														// for encryption matrix
 														// operations.
-//	public static int SEED = -1000; // Number of threads used
 	// X:/cjpProj/论文资料/联邦学习/code/exp1.db
 	public static String DB_PATH = "X:/cjpProj/论文资料/联邦学习/code/exp1.db";
 

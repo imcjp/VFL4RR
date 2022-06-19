@@ -3,7 +3,7 @@ package algs.vrg;
 import server.Coordinator;
 import alg.AlgInfo;
 /**
- * The code is for paper <b>"Efficient Vertical Federated Learning Method for Ridge Regression of Large-Scale Samples via Least-Squares Solution"</b>. <br/>
+ * The code is for paper <b>"Yang Q., Liu Y., Chen T., et al. (2019). Federated machine learning: concept and applications"</b>. <br/>
  * This class is the Coordination for VRG algorithm.
  */
 public class CoordinationServer extends Coordinator{

@@ -23,6 +23,75 @@ public class MatComputeHelper {
 		helper.dispose();
 	}
 
+	public static MWNumericArray matSplitAgt(MWNumericArray A,int sr, int tr, int sc,int tc) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.matSplitAgt(1,A,sr,tr,sc,tc);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	public static double getDouble(MWNumericArray A,int i, int j) {
+		return A.getDouble(new int[]{i,j});
+	}
+
+	public static double normAgt(MWNumericArray A) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.normAgt(1,A);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res.getDouble();
+	}
+	
+	public static MWNumericArray matSplitCAgt(MWNumericArray A,int sr, int tr, int sc,int tc) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.matSplitAgt(1,A,sr,tr,sc,tc);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	public static MWNumericArray matVerCatAgt(MWNumericArray A,MWNumericArray B) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.matVerCatAgt(1,A,B);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	public static MWNumericArray matHorCatAgt(MWNumericArray A,MWNumericArray B) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.matHorCatAgt(1,A,B);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+	public static MWNumericArray matSplitRAgt(MWNumericArray A,int sr, int tr) {
+		MWNumericArray res = null;
+		int m=A.getDimensions()[1];
+		try {
+			Object[] objs = helper.matSplitAgt(1,A,sr,tr,1,m);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
 	public static MWNumericArray randn(int n, int m) {
 		MWNumericArray res = null;
 		try {
@@ -34,6 +103,16 @@ public class MatComputeHelper {
 		return res;
 	}
 
+	public static MWNumericArray zeros(int n, int m) {
+		MWNumericArray res = null;
+		try {
+			Object[] objs = helper.zerosAgt(1, n, m);
+			res = (MWNumericArray) objs[0];
+		} catch (MWException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
 	public static MWNumericArray rand(int n, int m) {
 		MWNumericArray res = null;
 		try {

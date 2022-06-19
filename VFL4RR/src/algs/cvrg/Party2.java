@@ -1,9 +1,10 @@
-package algs.vrg;
+package algs.cvrg;
 
 import java.util.Map;
 
 import model.Message;
 import security.EncMat;
+//import security.EncMatMultThread;
 import alg.AlgInfo;
 import client.ClientForParticipant;
 
@@ -13,14 +14,16 @@ import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import common.MatComputeHelper;
 import common.RandNumGenerator;
 /**
- * The code is for paper <b>"Yang Q., Liu Y., Chen T., et al. (2019). Federated machine learning: concept and applications"</b>. <br/>
- * This class is the second participant for VRG algorithm.
+ * The code is for paper <b>"Edge Computing Aided Coded Vertical Federated Linear Regression"</b>. <br/>
+ * This class is the Coordination for CVRG algorithm.
  */
 public class Party2 extends ClientForParticipant{
 	private AlgInfo algInfo;
+	private EdgeComputingNodes ew=null;
 	public Party2(AlgInfo algInfo) {
 		super(algInfo.getParty(2), algInfo.getCoordinator());
 		this.algInfo=algInfo;
+		this.ew=new EdgeComputingNodes(6);
 	}
 
 	private MWNumericArray X0 = null;
@@ -44,7 +47,7 @@ public class Party2 extends ClientForParticipant{
 		EncMat encLa=(EncMat) msg.getObj();
 		MWNumericArray X=X0;
 		MWNumericArray Xt = MatComputeHelper.transpose(X);
-		MWNumericArray u=MatComputeHelper.mul(X, w);
+		MWNumericArray u=ew.edgeMatVecMul(X, w);
 		MWNumericArray db=MatComputeHelper.subtract(u, y);
 		EncMat encdb=new EncMat(db, pubKey);
 		MWNumericArray Lb=MatComputeHelper.mul(MatComputeHelper.transpose(db), db);
@@ -54,8 +57,14 @@ public class Party2 extends ClientForParticipant{
 		sendMessage(algInfo.getParty(1), 21, encdb);
 		sendMessage(algInfo.getCoordinator(), 21, encL);
 		EncMat encd=encdb.add(encua);
-		EncMat encg=EncMat.mul2(Xt, encd).add(MatComputeHelper.mul(algInfo.getLambda(), w));
-		g=decr(encg);
+		MWNumericArray wt=MatComputeHelper.mul(algInfo.getLambda(), w);
+		EncMat [] encgn=ew.edgeMatVecEncMul(Xt, encd);
+		MWNumericArray gn[]=new MWNumericArray[encgn.length];
+		for (int i = 0; i < encgn.length; i++) {
+			gn[i]=decr(encgn[i]);
+		}
+		g=ew.decode(gn, d);
+		g=MatComputeHelper.add(g, wt);
 		g=MatComputeHelper.mul(1.0/n, g);
 	}
 
